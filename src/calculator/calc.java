@@ -50,9 +50,31 @@ public class calc {
 		    comp_holder.push('(');
 		    String temp="";
 		    for(int i=0;i<str.length();i++){
-		        if(str.charAt(i)=='+'||str.charAt(i)=='-'||str.charAt(i)=='*'||str.charAt(i)=='/'||str.charAt(i)=='('){
-		            if(str.charAt(i)=='+'||str.charAt(i)=='-'||str.charAt(i)=='*'||str.charAt(i)=='/'){
-		                if(comp_holder.peek()=='*' || comp_holder.peek()=='/'){
+		        if(str.charAt(i)=='+'||str.charAt(i)=='-'||str.charAt(i)=='*'||str.charAt(i)=='/'||str.charAt(i)=='^'||str.charAt(i)=='('){
+		            if(str.charAt(i)=='+'||str.charAt(i)=='-'||str.charAt(i)=='*'||str.charAt(i)=='/'||str.charAt(i)=='^'){
+		                if(str.charAt(i)=='+'||str.charAt(i)=='-'){
+		                    if(comp_holder.peek()=='+' || comp_holder.peek()=='-'){
+		                        String s=String.valueOf(comp_holder.peek());
+		                        comp_holder.pop();
+		                        exp_holder.push(s);
+		                        comp_holder.push(str.charAt(i));
+		                    }
+		                    else{
+		                        comp_holder.push(str.charAt(i));
+		                    }
+		                }
+		                else if(str.charAt(i)=='^'){
+		                    if(comp_holder.peek()=='^'){
+		                        String s=String.valueOf(comp_holder.peek());
+		                        comp_holder.pop();
+		                        exp_holder.push(s);
+		                        comp_holder.push(str.charAt(i));
+		                    }
+		                    else{
+		                        comp_holder.push(str.charAt(i));
+		                    }
+		                }
+		                else if(comp_holder.peek()=='*' || comp_holder.peek()=='/'){
 		                    String s=String.valueOf(comp_holder.peek());
 		                    comp_holder.pop();
 		                    exp_holder.push(s);
@@ -63,6 +85,17 @@ public class calc {
 		                }
 		            }
 		            else{
+		                if(Character.isDigit(str.charAt(i-1))){
+		                    if(comp_holder.peek()=='*' || comp_holder.peek()=='/'){
+		                        String s=String.valueOf(comp_holder.peek());
+		                        comp_holder.pop();
+		                        exp_holder.push(s);
+		                        comp_holder.push('*');
+		                    }
+		                    else{
+		                        comp_holder.push('*');
+		                    }
+		                }
 		                comp_holder.push(str.charAt(i));
 		            }
 		        }
@@ -80,7 +113,7 @@ public class calc {
 		        }
 		        else{
 		            temp+=str.charAt(i);
-		            if(str.charAt(i+1)=='+'||str.charAt(i+1)=='-'||str.charAt(i+1)=='*'||str.charAt(i+1)=='/'||str.charAt(i+1)==')'){
+		            if(str.charAt(i+1)=='+'||str.charAt(i+1)=='-'||str.charAt(i+1)=='*'||str.charAt(i+1)=='/'||str.charAt(i+1)==')'||str.charAt(i+1)=='('||str.charAt(i+1)=='^'){
 		                exp_holder.push(temp);
 		                temp="";
 		            }
@@ -89,18 +122,18 @@ public class calc {
 		    return exp_holder;
 		}
 	  //calculating value from postfix expression
-		public static float calcNum(String str){
+	  public static double calcNum(String str){
 		    Vector<String> post = postfix(str);
-		    Stack<Float>holder =new Stack<>();
+		    Stack<Double>holder =new Stack<>();
 		    
 		    for(int i=0;i<post.size();i++){
 		        String s=post.get(i);
 		        char ch;
 		        ch=post.get(i).charAt(0);
-		        if(ch=='+'||ch=='-'||ch=='*'||ch=='/'){
-		            float a=holder.peek();
+		        if(ch=='+'||ch=='-'||ch=='*'||ch=='/'||ch=='^'){
+		            double a=holder.peek();
 		            holder.pop();
-		            float b=holder.peek();
+		            double b=holder.peek();
 		            holder.pop();
 		            if(ch=='+'){
 		                holder.push(b+a);
@@ -114,9 +147,12 @@ public class calc {
 		            else if(ch=='/'){
 		                holder.push(b/a);
 		            }
+		            else if(ch=='^'){
+		                holder.push((Math.pow(b,a)));
+		            }
 		        }
 		        else{
-		            holder.push(Float.parseFloat(s));
+		            holder.push(Double.parseDouble(s));
 		        }
 		    }
 		    return holder.peek();
@@ -142,6 +178,11 @@ public class calc {
 			value=value.substring(0,value.length()-1);
 			return value;
 		}
+		else if(s=="¹/x") {
+			String value=screen.getText().toString();
+			value="1/("+value+")";
+			return value;
+		}
 		else if(s=="=") {
 			String value=screen.getText().toString();
 			return getResult(value);
@@ -161,7 +202,7 @@ public class calc {
 		frmCalculator.setForeground(Color.GRAY);
 		
 		frmCalculator.getContentPane().setBackground(Color.GRAY);
-		frmCalculator.setBounds(100, 100, 302, 410);
+		frmCalculator.setBounds(100, 100, 302, 458);
 		frmCalculator.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmCalculator.getContentPane().setLayout(null);
 		
@@ -174,6 +215,22 @@ public class calc {
 		frmCalculator.getContentPane().add(screen);
 		screen.setColumns(10);
 		
+		//------------------------------------------
+		JButton btn_00 = new JButton("00");
+		btn_00.setForeground(Color.WHITE);
+		btn_00.setFont(new Font("Arial", Font.BOLD, 16));
+		btn_00.setFocusPainted(false);
+		btn_00.setBorderPainted(false);
+		btn_00.setBackground(Color.DARK_GRAY);
+		btn_00.setBounds(79, 356, 59, 48);
+		frmCalculator.getContentPane().add(btn_00);
+		btn_00.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				screen.setText(addText("00"));
+			}
+		});
+		//------------------------------------------
 		JButton btn_0 = new JButton("0");
 		btn_0.setFont(new Font("Arial", Font.BOLD, 16));
 		btn_0.setFocusPainted(false);
@@ -186,7 +243,7 @@ public class calc {
 			}
 		});
 		btn_0.setBackground(Color.DARK_GRAY);
-		btn_0.setBounds(10, 297, 59, 48);
+		btn_0.setBounds(10, 356, 59, 48);
 		frmCalculator.getContentPane().add(btn_0);
 		//------------------------------------------
 		JButton btn_1 = new JButton("1");
@@ -201,7 +258,7 @@ public class calc {
 			}
 		});
 		btn_1.setBackground(Color.DARK_GRAY);
-		btn_1.setBounds(10, 238, 59, 48);
+		btn_1.setBounds(10, 297, 59, 48);
 		frmCalculator.getContentPane().add(btn_1);
 		//------------------------------------------
 		JButton btn_2 = new JButton("2");
@@ -216,7 +273,7 @@ public class calc {
 			}
 		});
 		btn_2.setBackground(Color.DARK_GRAY);
-		btn_2.setBounds(79, 238, 59, 48);
+		btn_2.setBounds(79, 297, 59, 48);
 		frmCalculator.getContentPane().add(btn_2);
 		//------------------------------------------
 		JButton btn_3 = new JButton("3");
@@ -231,7 +288,7 @@ public class calc {
 			}
 		});
 		btn_3.setBackground(Color.DARK_GRAY);
-		btn_3.setBounds(148, 238, 59, 48);
+		btn_3.setBounds(148, 297, 59, 48);
 		frmCalculator.getContentPane().add(btn_3);
 		//------------------------------------------
 		JButton btn_4 = new JButton("4");
@@ -246,7 +303,7 @@ public class calc {
 			}
 		});
 		btn_4.setBackground(Color.DARK_GRAY);
-		btn_4.setBounds(10, 180, 59, 48);
+		btn_4.setBounds(10, 239, 59, 48);
 		frmCalculator.getContentPane().add(btn_4);
 		//------------------------------------------
 		JButton btn_5 = new JButton("5");
@@ -261,7 +318,7 @@ public class calc {
 			}
 		});
 		btn_5.setBackground(Color.DARK_GRAY);
-		btn_5.setBounds(79, 180, 59, 48);
+		btn_5.setBounds(79, 239, 59, 48);
 		frmCalculator.getContentPane().add(btn_5);
 		//------------------------------------------
 		JButton btn_6 = new JButton("6");
@@ -276,7 +333,7 @@ public class calc {
 			}
 		});
 		btn_6.setBackground(Color.DARK_GRAY);
-		btn_6.setBounds(148, 180, 59, 48);
+		btn_6.setBounds(148, 239, 59, 48);
 		frmCalculator.getContentPane().add(btn_6);
 		//------------------------------------------
 		JButton btn_7 = new JButton("7");
@@ -291,7 +348,7 @@ public class calc {
 			}
 		});
 		btn_7.setBackground(Color.DARK_GRAY);
-		btn_7.setBounds(10, 121, 59, 48);
+		btn_7.setBounds(10, 180, 59, 48);
 		frmCalculator.getContentPane().add(btn_7);
 		//------------------------------------------
 		JButton btn_8 = new JButton("8");
@@ -306,7 +363,7 @@ public class calc {
 			}
 		});
 		btn_8.setBackground(Color.DARK_GRAY);
-		btn_8.setBounds(79, 121, 59, 48);
+		btn_8.setBounds(79, 180, 59, 48);
 		frmCalculator.getContentPane().add(btn_8);
 		//------------------------------------------
 		JButton btn_9 = new JButton("9");
@@ -321,7 +378,7 @@ public class calc {
 			}
 		});
 		btn_9.setBackground(Color.DARK_GRAY);
-		btn_9.setBounds(148, 121, 59, 48);
+		btn_9.setBounds(148, 180, 59, 48);
 		frmCalculator.getContentPane().add(btn_9);
 		//------------------------------------------
 		JButton btn_dot = new JButton(".");
@@ -336,10 +393,10 @@ public class calc {
 			}
 		});
 		btn_dot.setBackground(Color.DARK_GRAY);
-		btn_dot.setBounds(79, 297, 59, 48);
+		btn_dot.setBounds(148, 356, 59, 48);
 		frmCalculator.getContentPane().add(btn_dot);
 		//------------------------------------------
-		JButton btn_c = new JButton("c");
+		JButton btn_c = new JButton("Clr");
 		btn_c.setFont(new Font("Arial", Font.BOLD, 16));
 		btn_c.setFocusPainted(false);
 		btn_c.setBorderPainted(false);
@@ -354,7 +411,7 @@ public class calc {
 		btn_c.setBounds(148, 59, 59, 48);
 		frmCalculator.getContentPane().add(btn_c);
 		//------------------------------------------
-		JButton btn_back = new JButton("<=");
+		JButton btn_back = new JButton("<");
 		btn_back.setFont(new Font("Arial", Font.BOLD, 16));
 		btn_back.setFocusPainted(false);
 		btn_back.setBorderPainted(false);
@@ -396,7 +453,7 @@ public class calc {
 			}
 		});
 		btn_minus.setBackground(Color.DARK_GRAY);
-		btn_minus.setBounds(217, 238, 59, 48);
+		btn_minus.setBounds(217, 239, 59, 48);
 		frmCalculator.getContentPane().add(btn_minus);
 		//------------------------------------------
 		JButton btn_mul = new JButton("*");
@@ -426,7 +483,7 @@ public class calc {
 			}
 		});
 		btn_div.setBackground(Color.DARK_GRAY);
-		btn_div.setBounds(217, 122, 59, 47);
+		btn_div.setBounds(217, 118, 59, 47);
 		frmCalculator.getContentPane().add(btn_div);
 		//------------------------------------------
 		JButton btn_open = new JButton("(");
@@ -471,7 +528,53 @@ public class calc {
 			}
 		});
 		btn_equal.setBackground(Color.DARK_GRAY);
-		btn_equal.setBounds(148, 297, 59, 48);
+		btn_equal.setBounds(217, 356, 59, 48);
 		frmCalculator.getContentPane().add(btn_equal);
+		//------------------------------------------
+		JButton btn_squre = new JButton("x²");
+		btn_squre.setForeground(Color.WHITE);
+		btn_squre.setFont(new Font("Arial", Font.BOLD, 16));
+		btn_squre.setFocusPainted(false);
+		btn_squre.setBorderPainted(false);
+		btn_squre.setBackground(Color.DARK_GRAY);
+		btn_squre.setBounds(148, 118, 59, 48);
+		frmCalculator.getContentPane().add(btn_squre);
+		btn_squre.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				screen.setText(addText("^2"));
+			}
+		});
+		//------------------------------------------
+		JButton btn_power = new JButton("^");
+		btn_power.setForeground(Color.WHITE);
+		btn_power.setFont(new Font("Arial", Font.BOLD, 16));
+		btn_power.setFocusPainted(false);
+		btn_power.setBorderPainted(false);
+		btn_power.setBackground(Color.DARK_GRAY);
+		btn_power.setBounds(79, 118, 59, 48);
+		frmCalculator.getContentPane().add(btn_power);
+		btn_power.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				screen.setText(addText("^"));
+			}
+		});
+		//------------------------------------------
+		JButton btn_resiprocal = new JButton("¹/x");
+		btn_resiprocal.setForeground(Color.WHITE);
+		btn_resiprocal.setFont(new Font("Arial", Font.BOLD, 16));
+		btn_resiprocal.setFocusPainted(false);
+		btn_resiprocal.setBorderPainted(false);
+		btn_resiprocal.setBackground(Color.DARK_GRAY);
+		btn_resiprocal.setBounds(10, 117, 59, 48);
+		frmCalculator.getContentPane().add(btn_resiprocal);
+		btn_resiprocal.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				screen.setText(addText("¹/x"));
+			}
+		});
+		//------------------------------------------
 	}
 }
