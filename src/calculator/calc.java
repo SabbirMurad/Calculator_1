@@ -53,7 +53,7 @@ public class calc {
 		        if(str.charAt(i)=='+'||str.charAt(i)=='-'||str.charAt(i)=='*'||str.charAt(i)=='/'||str.charAt(i)=='^'||str.charAt(i)=='('){
 		            if(str.charAt(i)=='+'||str.charAt(i)=='-'||str.charAt(i)=='*'||str.charAt(i)=='/'||str.charAt(i)=='^'){
 		                if(str.charAt(i)=='+'||str.charAt(i)=='-'){
-		                    if(comp_holder.peek()=='+' || comp_holder.peek()=='-'){
+		                    if(comp_holder.peek()=='+' || comp_holder.peek()=='-'||comp_holder.peek()=='*' || comp_holder.peek()=='/'){
 		                        String s=String.valueOf(comp_holder.peek());
 		                        comp_holder.pop();
 		                        exp_holder.push(s);
