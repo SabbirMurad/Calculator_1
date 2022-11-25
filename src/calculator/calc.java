@@ -43,84 +43,82 @@ public class calc {
 		initialize();
 	}
 	//changing the string to postfix
-	  public static Stack<String> postfix(String str){
-		    Stack<String> exp_holder=new Stack<>();
-		    Stack<Character> comp_holder=new Stack<>();
-		    str+=")";
-		    comp_holder.push('(');
-		    String temp="";
-		    for(int i=0;i<str.length();i++){
-		        if(str.charAt(i)=='+'||str.charAt(i)=='-'||str.charAt(i)=='*'||str.charAt(i)=='/'||str.charAt(i)=='^'||str.charAt(i)=='('){
-		            if(str.charAt(i)=='+'||str.charAt(i)=='-'||str.charAt(i)=='*'||str.charAt(i)=='/'||str.charAt(i)=='^'){
-		                if(str.charAt(i)=='+'||str.charAt(i)=='-'){
-		                    if(comp_holder.peek()=='+' || comp_holder.peek()=='-'||comp_holder.peek()=='*' || comp_holder.peek()=='/'){
-		                        String s=String.valueOf(comp_holder.peek());
-		                        comp_holder.pop();
-		                        exp_holder.push(s);
-		                        comp_holder.push(str.charAt(i));
-		                    }
-		                    else{
-		                        comp_holder.push(str.charAt(i));
-		                    }
-		                }
-		                else if(str.charAt(i)=='^'){
-		                    if(comp_holder.peek()=='^'){
-		                        String s=String.valueOf(comp_holder.peek());
-		                        comp_holder.pop();
-		                        exp_holder.push(s);
-		                        comp_holder.push(str.charAt(i));
-		                    }
-		                    else{
-		                        comp_holder.push(str.charAt(i));
-		                    }
-		                }
-		                else if(comp_holder.peek()=='*' || comp_holder.peek()=='/'){
-		                    String s=String.valueOf(comp_holder.peek());
-		                    comp_holder.pop();
-		                    exp_holder.push(s);
-		                    comp_holder.push(str.charAt(i));
-		                }
-		                else{
-		                    comp_holder.push(str.charAt(i));
-		                }
-		            }
-		            else{
-		                if(Character.isDigit(str.charAt(i-1))){
-		                    if(comp_holder.peek()=='*' || comp_holder.peek()=='/'){
-		                        String s=String.valueOf(comp_holder.peek());
-		                        comp_holder.pop();
-		                        exp_holder.push(s);
-		                        comp_holder.push('*');
-		                    }
-		                    else{
-		                        comp_holder.push('*');
-		                    }
-		                }
-		                comp_holder.push(str.charAt(i));
-		            }
-		        }
-		        else if(str.charAt(i)==')'){
-		            while (comp_holder.peek()!='('){
-		                String s="";
-		                s+=comp_holder.peek();
-		                comp_holder.pop();
-		                exp_holder.push(s);
-		                if(comp_holder.size()==0){
-		                    break;
-		                }
-		            }
+	public static Stack<String> postfix(String str){
+		Stack<String> exp_holder=new Stack<>();
+		Stack<Character> comp_holder=new Stack<>();
+		str+=")";
+		comp_holder.push('(');
+		String temp="";
+		for(int i=0;i<str.length();i++){
+			if(str.charAt(i)=='+'||str.charAt(i)=='-'){
+		        if(comp_holder.peek()=='+' || comp_holder.peek()=='-'||comp_holder.peek()=='*' || comp_holder.peek()=='/'){
+		        	String s=String.valueOf(comp_holder.peek());
 		            comp_holder.pop();
+		            exp_holder.push(s);
+		            comp_holder.push(str.charAt(i));
 		        }
 		        else{
-		            temp+=str.charAt(i);
-		            if(str.charAt(i+1)=='+'||str.charAt(i+1)=='-'||str.charAt(i+1)=='*'||str.charAt(i+1)=='/'||str.charAt(i+1)==')'||str.charAt(i+1)=='('||str.charAt(i+1)=='^'){
-		                exp_holder.push(temp);
-		                temp="";
-		            }
+		        	comp_holder.push(str.charAt(i));
 		        }
-		    }
-		    return exp_holder;
+			}
+			else if(str.charAt(i)=='*'||str.charAt(i)=='/'){
+				if(comp_holder.peek()=='*' || comp_holder.peek()=='/'){
+					String s=String.valueOf(comp_holder.peek());
+					comp_holder.pop();
+					exp_holder.push(s);
+					comp_holder.push(str.charAt(i));
+				}
+		        else{
+		        	comp_holder.push(str.charAt(i));
+		        }
+			}
+			else if(str.charAt(i)=='^'){
+				if(comp_holder.peek()=='^'){
+					String s=String.valueOf(comp_holder.peek());
+					comp_holder.pop();
+					exp_holder.push(s);
+					comp_holder.push(str.charAt(i));
+		        }
+		        else{
+		        	comp_holder.push(str.charAt(i));
+		        }
+			}
+			else if(str.charAt(i)=='('){
+				if(i>0 && Character.isDigit(str.charAt(i-1))){
+					if(comp_holder.peek()=='*' || comp_holder.peek()=='/'){
+						String s=String.valueOf(comp_holder.peek());
+						comp_holder.pop();
+						exp_holder.push(s);
+						comp_holder.push('*');
+					}
+					else{
+						comp_holder.push('*');
+					}
+				}
+				comp_holder.push(str.charAt(i));
+			}
+			else if(str.charAt(i)==')'){
+				while (comp_holder.peek()!='('){
+					String s="";
+					s+=comp_holder.peek();
+					comp_holder.pop();
+					exp_holder.push(s);
+					if(comp_holder.size()==0){
+						break;
+					}
+				}
+				comp_holder.pop();
+			}
+			else{
+				temp+=str.charAt(i);
+				if(str.charAt(i+1)=='+'||str.charAt(i+1)=='-'||str.charAt(i+1)=='*'||str.charAt(i+1)=='/'||str.charAt(i+1)==')'||str.charAt(i+1)=='('||str.charAt(i+1)=='^'){
+					exp_holder.push(temp);
+					temp="";
+				}
+			}
 		}
+		return exp_holder;
+	}
 	  //calculating value from postfix expression
 	  public static double calcNum(String str){
 		    Vector<String> post = postfix(str);
